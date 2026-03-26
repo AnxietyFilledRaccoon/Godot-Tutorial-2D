@@ -4,16 +4,20 @@ extends Node
 var score
 
 func _ready():
-	new_game()
+	pass
 
 func game_over():
 	$ScoreTimer.stop()
 	$MobTimer.stop()
+	$HUD.show_game_over()
 
 func new_game():
 	score = 0
+	$HUD.update_score(score)
+	$HUD.show_message("Get Ready")
 	$Player.start($StartPosition.position)
 	$StartTimer.start()
+	get_tree().call_group("mobs", "queue_free")
 
 func _on_mob_timer_timeout():
 	# Se crea un mob nuevo.
@@ -42,7 +46,12 @@ func _on_mob_timer_timeout():
 
 func _on_score_timer_timeout() -> void:
 	score += 1
+	$HUD.update_score(score)
 	
 func _on_start_timer_timeout() -> void:
 	$MobTimer.start()
 	$ScoreTimer.start()
+
+func _on_hud_start_game() -> void:
+	$StartButton.hide()
+	new_game().emit()
